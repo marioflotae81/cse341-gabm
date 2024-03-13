@@ -1,7 +1,6 @@
 const { client } = require('../db');
-const {
-    updateUser,
-} = require('../models')
+const { usersHandler } = require('../models')
+
 
 const homeRoute = (req, res) => {
     res.send('Welcome, my friend!')
@@ -24,6 +23,7 @@ const isLoggedIn = (req, res, next) => {
     }
 };
 
+// Save user info at login
 const successRoute = async (req, res) => {
     const data = {
         UserEmail: req.user._json.email,
@@ -31,11 +31,11 @@ const successRoute = async (req, res) => {
         UserPicture: req.user._json.picture,
         UserRole: null,
         UserNPN: null
-        
-    }
+    };
 
     try {
-        const result = await updateUser(data);
+        
+        const result = await usersHandler.updateUserLogin(data);
 
         if (result.acknowledged) {
             console.log('You are logged in...')
