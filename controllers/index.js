@@ -1,4 +1,7 @@
 const { client } = require('../db');
+const {
+    updateUser,
+} = require('../models')
 
 const homeRoute = (req, res) => {
     res.send('Welcome, my friend!')
@@ -21,8 +24,30 @@ const isLoggedIn = (req, res, next) => {
     }
 };
 
-const successRoute = (req, res) => {
-    res.send(`Welcome ${req.user.displayName}`)
+const successRoute = async (req, res) => {
+    const data = {
+        UserEmail: req.user._json.email,
+        UserName: req.user._json.name,
+        UserPicture: req.user._json.picture,
+        UserRole: null,
+        UserNPN: null
+        
+    }
+
+    try {
+        const result = await updateUser(data);
+
+        if (result.acknowledged) {
+            console.log('You are logged in...')
+            return res.status(200).json({ message: `Welcome ${req.user.displayName}` });
+        } else {
+            return res.status(400).json({ error: `Something went wrong updating the user with email: ${data.UserEmail}` })
+        }
+    } catch (error) {
+        console.error(error);
+    } finally {
+        client.close();
+    }
 };
 
 const googleCallbackRoute = (req, res) => {
