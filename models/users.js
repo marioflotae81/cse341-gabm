@@ -10,6 +10,21 @@ const usersCollection = database.collection(process.env.MONGO_USERS_COLLECTION);
 
 
 // Fetch All Docs
+const fetchAll = async () => {
+    try {
+        await client.connect();
+        
+        const result = await usersCollection.find({}).toArray();
+
+        if (!result) {
+            throw new Error('No Users found.')
+        }
+
+        return result;
+    } catch (error) {
+        console.error(error);
+    }
+};
 
 
 // Fetch Single Doc
@@ -63,5 +78,6 @@ const updateUserLogin = async (data) => {
 // Delete User
 
 module.exports = {
+    fetchAll,
     updateUserLogin,
 }

@@ -4,8 +4,8 @@ const controllers = require('../controllers');
 const broker = require('./brokers');
 const carrier = require('./carriers');
 const client = require('./clients');
-const user = require('./users')
-require('../passport')
+const user = require('./users');
+require('../passport');
 
 
 routes.get('/', controllers.isLoggedIn, controllers.homeRoute);
@@ -29,6 +29,8 @@ routes.get('/success', controllers.isLoggedIn, controllers.successRoute);
 
 routes.get('/logout', controllers.logoutRoute);
 
-routes.get('/failed', controllers.failedRoute)
+routes.get('/failed', controllers.failedRoute);
+
+routes.use('/users', controllers.isLoggedIn, user);
 
 module.exports = routes;

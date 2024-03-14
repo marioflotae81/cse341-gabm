@@ -9,16 +9,7 @@ const carriersCollection = database.collection(process.env.MONGO_CARRIERS_COLLEC
 const clientsCollection = database.collection(process.env.MONGO_CLIENTS_COLLECTION);
 const usersCollection = database.collection(process.env.MONGO_USERS_COLLECTION);
 
-//** Brokers CRUD **//
 
-
-//** Carriers CRUD **///
-
-
-//** Clients CRUD **//
-
-
-//** Users CRUD **//
 module.exports = {
     usersHandler: usersCRUD
 };
