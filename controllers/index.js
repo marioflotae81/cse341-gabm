@@ -1,6 +1,5 @@
 const { client } = require('../db');
 const { usersHandler } = require('../models');
-const { usersControllers } = require('./users');
 
 
 const homeRoute = (req, res) => {

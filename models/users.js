@@ -7,6 +7,21 @@ const usersCollection = database.collection(process.env.MONGO_USERS_COLLECTION);
 
 
 // Create Doc
+const insertUser = async (user) => {
+    try {
+        await client.connect();
+
+        const result = await usersCollection.insertOne(user);
+
+        if (!result) {
+            throw new Error('User was not created')
+        }
+
+        return result;
+    } catch (error) {
+        console.error(error);
+    }
+};
 
 
 // Fetch All Docs
@@ -28,7 +43,23 @@ const fetchAll = async () => {
 
 
 // Fetch Single Doc
+const fetchOne = async (id) => {
+    try {
+        await client.connect();
+        
+        const objectId = new ObjectId(id);
+        
+        const result = await usersCollection.findOne({ _id: objectId });
 
+        if (!result) {
+            throw new Error('User not found.')
+        }
+
+        return result;
+    } catch (error) {
+        console.error(error);
+    }
+};
 
 // Update User at Login
 const updateUserLogin = async (data) => {
@@ -73,11 +104,14 @@ const updateUserLogin = async (data) => {
 
 
 // Update User
-
+const updateUser = async (user) => {};
 
 // Delete User
 
 module.exports = {
+    insertUser,
     fetchAll,
+    fetchOne,
     updateUserLogin,
+    updateUser,
 }
