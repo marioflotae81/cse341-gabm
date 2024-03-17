@@ -5,10 +5,9 @@
     "description": "Final Project. General Agency Broker Management.",
     "version": "1.0.0"
   },
-  "host": "localhost:3003",
+  "host": "cse341-gabm.onrender.com",
   "basePath": "/",
   "schemes": [
-    "http",
     "https"
   ],
   "paths": {

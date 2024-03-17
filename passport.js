@@ -13,8 +13,8 @@ passport.deserializeUser(function(user, done) {
 passport.use(new GoogleStrategy({
     clientID: process.env.CLIENT_ID,
     clientSecret: process.env.CLIENT_SECRET,
-    // callbackURL: "https://cse341-gabm.onrender.com/google/callback",
-    callbackURL: "http://localhost:3003/google/callback",
+    callbackURL: "https://cse341-gabm.onrender.com/google/callback",
+    // callbackURL: "http://localhost:3003/google/callback",
     passReqToCallback: true
 },
 function(request, accessToken, refreshToken, profile, done) {
