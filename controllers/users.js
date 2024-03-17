@@ -88,7 +88,7 @@ const getOne = async (req, res) => {
 
 
 // Update User
-const updateOneUser = async (id) => {
+const updateOneUser = async (req, res) => {
     const id = req.params.id;
     if (id.length !== 24) {
         return res.status(404).json({
