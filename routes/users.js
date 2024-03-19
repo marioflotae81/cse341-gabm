@@ -11,6 +11,9 @@ routes.get('/', userControllers.getAll);
 routes.get('/:id', userControllers.getOne);
 
 // Update User
-routes.put('/:id', userControllers.updateOneUser)
+routes.put('/:id', userControllers.updateOneUser);
+
+// Delete User
+routes.delete('/:id', userControllers.deleteOneUser)
 
 module.exports = routes;

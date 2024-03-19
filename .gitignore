@@ -1,2 +1,5 @@
 node_modules
 .env
+passport.js
+swagger.js
+swagger.json

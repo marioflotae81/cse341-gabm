@@ -104,9 +104,54 @@ const updateUserLogin = async (data) => {
 
 
 // Update User
-const updateUser = async (user) => {};
+const updateUser = async (user) => {
+    let { id, UserEmail, UserName, UserPicture, UserRole, UserNPN } = user;
+
+    try {
+        await client.connect();
+
+        const objectId = new ObjectId(id);
+
+        const result = await usersCollection.findOneAndUpdate(
+            {
+                _id: objectId
+            },
+            {
+                $set: {
+                    UserEmail: UserEmail,
+                    UserName: UserName,
+                    UserPicture: UserPicture,
+                    UserNPN: UserNPN,
+                    UserRole: UserRole,
+                }
+            },
+        );
+
+        if (!result) {
+            throw new Error('There was a problem updating the User')
+        }
+
+        return result;
+
+    } catch (error) {
+        console.error(error);
+    }
+};
 
 // Delete User
+const deleteUser = async (id) => {
+    try {
+        const objectId = new ObjectId(id);
+
+        await client.connect();
+
+        const result = usersCollection.deleteOne({ _id: objectId });
+
+        return result;
+    } catch (error) {
+        console.error(error);
+    }
+};
 
 module.exports = {
     insertUser,
@@ -114,4 +159,5 @@ module.exports = {
     fetchOne,
     updateUserLogin,
     updateUser,
+    deleteUser,
 }

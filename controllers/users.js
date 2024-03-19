@@ -18,6 +18,7 @@ const createUser = async (req, res) => {
     const user = {
         UserEmail: req.body.UserEmail,
         UserName: req.body.UserName,
+        UserPicture: req.body.UserPicture,
         UserNPN: req.body.UserNPN,
         UserRole: req.body.UserRole
     };
@@ -74,7 +75,7 @@ const getOne = async (req, res) => {
         if (!user) {
             throw new Error('No user found')
         }
-        console.log(user)
+
         return res.send(user);
     } catch (error) {
         console.error(error);
@@ -104,16 +105,18 @@ const updateOneUser = async (req, res) => {
 
     // Create User Object
     const user = {
+        id: req.params.id,
         UserEmail: req.body.UserEmail,
         UserName: req.body.UserName,
+        UserPicture: req.body.UserPicture,
         UserNPN: req.body.UserNPN,
         UserRole: req.body.UserRole
     };
 
     try {
-        const result = await updateUser(user);
+        const result = await usersHandler.updateUser(user);
 
-        if (result.modifiedCount > 0) {
+        if (result) {
             return res.status(200).json({ message: "User was updated Successfully." })
         } else {
             return res.status(400).json({ error: "Something went wrong :/" })
@@ -128,9 +131,38 @@ const updateOneUser = async (req, res) => {
     }
 };
 
+//Delete User
+const deleteOneUser = async (req, res) => {
+    const id = req.params.id
+    if (id.length !== 24) {
+        return res.status(404).json({
+            error: 'Not a valid ID.'
+        });
+    }
+
+    try {
+        const result = await usersHandler.deleteUser(id);
+
+        if (result.deletedCount === 1) {
+            return res.status(200).json({ message: "User was deleted successfully." })
+        } else {
+            return res.status(400).json({ error: "Something went wrong, sorry." })
+        }
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            error: 'Internal Server Error.'
+        })
+    } finally {
+        client.close();
+    }
+
+};
+
 module.exports = {
     createUser,
     getAll,
     getOne,
     updateOneUser,
+    deleteOneUser
 };
