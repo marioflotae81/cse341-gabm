@@ -1,35 +1,32 @@
 const { client } = require('../db');
-const { usersHandler } = require('../models');
+const { carriersHandler } = require('../models');
 
-// create a user
-const createUser = async (req, res) => {
+// create a Carrier
+const createCarrier = async (req, res) => {
     // Validate data
     if(
-        !req.body.UserEmail ||
-        !req.body.UserName ||
-        !req.body.UserNPN ||
-        !req.body.UserRole
+        !req.body.CarrierName ||
+        !req.body.CarrierState ||
+        !req.body.CarrierWebsite
     ) {
         return res.status(400).send({ error: 'Content can\'t be empty.' });
     }
 
-    // Create User Object
-    const user = {
-        UserEmail: req.body.UserEmail,
-        UserName: req.body.UserName,
-        UserPicture: req.body.UserPicture,
-        UserNPN: req.body.UserNPN,
-        UserRole: req.body.UserRole
+    // Create Carrier Object
+    const carrier = {
+        CarrierName: req.body.CarrierName,
+        CarrierState: req.body.CarrierState,
+        CarrierWebsite: req.body.CarrierWebsite,
     };
 
     try {
-        const result = await usersHandler.insertUser(user);
+        const result = await carriersHandler.insertCarrier(carrier);
 
         if (!result) {
             throw new Error('There was a problem creating the user')
         } else {
             return res.status(201).json({
-                message: `New User Id: ${(await result).insertedId}`
+                message: `New Carrier Id: ${(await result).insertedId}`
             })
         }
     } catch (error) {
@@ -42,10 +39,10 @@ const createUser = async (req, res) => {
     }
 };
 
-// fetch all users
-const getAll = async (req, res) => {
+// fetch all Carriers
+const getAllCarriers = async (req, res) => {
     try {
-        const data = await usersHandler.fetchAll();
+        const data = await carriersHandler.fetchAllCarriers();
 
         if (!data) {
             throw new Error('No data')
@@ -53,14 +50,16 @@ const getAll = async (req, res) => {
         return res.send(data);
     } catch (error) {
         console.error;
-        res.status(500).json({ error: error.message || "There was an error fetching the users." })
+        res.status(500).json({ 
+            error: error.message || "There was an error fetching the Carriers." 
+        });
     } finally {
         client.close();
     }
 };
 
-// fetch one user
-const getOne = async (req, res) => {
+// fetch one Carrier
+const getOneCarrier = async (req, res) => {
     const id = req.params.id
     if (id.length !== 24) {
         return res.status(404).json({
@@ -69,13 +68,13 @@ const getOne = async (req, res) => {
     }
 
     try {
-        const user = await usersHandler.fetchOne(id);
+        const carrier = await carriersHandler.fetchOneCarrier(id);
 
-        if (!user) {
-            throw new Error('No user found')
+        if (!carrier) {
+            throw new Error('No Carrier found')
         }
 
-        return res.send(user);
+        return res.send(carrier);
     } catch (error) {
         console.error(error);
         res.status(500).json({
@@ -87,8 +86,8 @@ const getOne = async (req, res) => {
 };
 
 
-// Update User
-const updateOneUser = async (req, res) => {
+// Update Carrier
+const updateOneCarrier = async (req, res) => {
     const id = req.params.id;
     if (id.length !== 24) {
         return res.status(404).json({
@@ -96,42 +95,44 @@ const updateOneUser = async (req, res) => {
         });
     }
 
-    if (!req.body.UserEmail || !req.body.UserName) {
+    if (
+        !req.body.CarrierName || 
+        !req.body.CarrierState ||
+        !req.body.CarrierWebsite
+        ) {
         return res.status(400).json({
             error: 'Bad Request. No data provided.'
         })
     }
 
-    // Create User Object
-    const user = {
+    // Create Carrier Object
+    const carrier = {
         id: req.params.id,
-        UserEmail: req.body.UserEmail,
-        UserName: req.body.UserName,
-        UserPicture: req.body.UserPicture,
-        UserNPN: req.body.UserNPN,
-        UserRole: req.body.UserRole
+        CarrierName: req.body.CarrierName,
+        CarrierState: req.body.CarrierState,
+        CarrierWebsite: req.body.CarrierWebsite,
     };
 
     try {
-        const result = await usersHandler.updateUser(user);
+        const result = await carriersHandler.updateCarrier(carrier);
 
         if (result) {
-            return res.status(200).json({ message: "User was updated Successfully." })
+            return res.status(200).json({ message: "Carrier was updated Successfully." })
         } else {
             return res.status(400).json({ error: "Something went wrong :/" })
         }
     } catch(error) {
         console.error(error);
         return res.status(500).json({
-            error: 'Internal Server Error'
+            error: 'Internal Server Error.'
         });
     } finally {
         client.close();
     }
 };
 
-//Delete User
-const deleteOneUser = async (req, res) => {
+//Delete Carrier
+const deleteOneCarrier = async (req, res) => {
     const id = req.params.id
     if (id.length !== 24) {
         return res.status(404).json({
@@ -140,10 +141,10 @@ const deleteOneUser = async (req, res) => {
     }
 
     try {
-        const result = await usersHandler.deleteUser(id);
+        const result = await carriersHandler.deleteCarrier(id);
 
         if (result.deletedCount === 1) {
-            return res.status(200).json({ message: "User was deleted successfully." })
+            return res.status(200).json({ message: "Carrier was deleted successfully." })
         } else {
             return res.status(400).json({ error: "Something went wrong, sorry." })
         }
@@ -159,9 +160,9 @@ const deleteOneUser = async (req, res) => {
 };
 
 module.exports = {
-    createUser,
-    getAll,
-    getOne,
-    updateOneUser,
-    deleteOneUser
+    createCarrier,
+    getAllCarriers,
+    getOneCarrier,
+    updateOneCarrier,
+    deleteOneCarrier,
 };

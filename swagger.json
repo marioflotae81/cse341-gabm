@@ -380,6 +380,9 @@
             "schema": {
               "type": "object",
               "properties": {
+                "NPN": {
+                  "example": "any"
+                },
                 "BrokerFirstName": {
                   "example": "any"
                 },
@@ -450,6 +453,9 @@
             "schema": {
               "type": "object",
               "properties": {
+                "NPN": {
+                  "example": "any"
+                },
                 "BrokerFirstName": {
                   "example": "any"
                 },

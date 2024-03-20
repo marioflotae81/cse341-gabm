@@ -33,4 +33,10 @@ routes.get('/failed', controllers.failedRoute);
 
 routes.use('/users', controllers.isLoggedIn, user);
 
+routes.use('/carriers', controllers.isLoggedIn, carrier);
+
+routes.use('/brokers', controllers.isLoggedIn, broker);
+
+routes.use('/clients', controllers.isLoggedIn, client);
+
 module.exports = routes;
