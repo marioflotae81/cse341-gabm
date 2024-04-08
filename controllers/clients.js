@@ -3,6 +3,7 @@ const { clientsHandler } = require('../models');
 
 // create a Client
 const createClient = async (req, res) => {
+    let npn;
     // Validate data
     if(
         !req.body.SubscriberFirstName ||
@@ -17,6 +18,18 @@ const createClient = async (req, res) => {
         return res.status(400).send({ error: 'Content can\'t be empty.' });
     }
 
+    if (!req.userRole || !req.userBrokerNPN) {
+        return res.status(401).json({ error: 'No Valid Role or NPN'});
+    }
+
+    if (req.userRole === 'BROKER') {
+        npn = req.userBrokerNPN;
+    } else if (req.userRole === 'ADMIN') {
+        npn = req.body.BrokerNPN;
+    } else {
+        return res.status(401).json({ error: 'No Valid Role' });
+    }
+
     // Create Client Object
     const subscriber = {
         SubscriberFirstName: req.body.SubscriberFirstName,
@@ -26,7 +39,7 @@ const createClient = async (req, res) => {
         SubscriberPhone: req.body.SubscriberPhone,
         SubscriberPolicy: req.body.SubscriberPolicy,
         CarrierDocumentId: req.body.CarrierDocumentId,
-        BrokerNPN: req.body.BrokerNPN,
+        BrokerNPN: npn,
     };
 
     try {
@@ -51,8 +64,14 @@ const createClient = async (req, res) => {
 
 // fetch all Clients
 const getAllClients = async (req, res) => {
+    const role = req.userRole;
+    const NPN = req.userBrokerNPN;
+    if (!role || !NPN) {
+        return res.status(401).json({ error: 'No Valid Role or NPN.' });
+    }
+
     try {
-        const data = await clientsHandler.fetchAllClients();
+        const data = await clientsHandler.fetchAllClients(role, NPN);
 
         if (!data) {
             throw new Error('No data')
@@ -77,8 +96,14 @@ const getOneClient = async (req, res) => {
         });
     }
 
+    const role = req.userRole;
+    const NPN = req.userBrokerNPN;
+    if (!role || !NPN) {
+        return res.status(401).json({ error: 'No Valid Role or NPN.' });
+    }
+
     try {
-        const subscriber = await clientsHandler.fetchOneClient(id);
+        const subscriber = await clientsHandler.fetchOneClient(id, role, NPN);
 
         if (!subscriber) {
             throw new Error('No Client found')
@@ -98,6 +123,8 @@ const getOneClient = async (req, res) => {
 
 // Update Client
 const updateOneClient = async (req, res) => {
+    let npn = req.userBrokerNPN;
+    let role = req.userRole;
     const id = req.params.id;
     if (id.length !== 24) {
         return res.status(404).json({
@@ -120,6 +147,18 @@ const updateOneClient = async (req, res) => {
         })
     }
 
+    if (!role || !npn) {
+        return res.status(401).json({ error: 'No Valid Role or NPN'});
+    }
+
+    if (role === 'BROKER') {
+        npn = req.userBrokerNPN;
+    } else if (role === 'ADMIN') {
+        npn = req.body.BrokerNPN;
+    } else {
+        return res.status(401).json({ error: 'No Valid Role' });
+    }
+
     // Create Client Object
     const subscriber = {
         id: req.params.id,
@@ -130,16 +169,16 @@ const updateOneClient = async (req, res) => {
         SubscriberPhone: req.body.SubscriberPhone,
         SubscriberPolicy: req.body.SubscriberPolicy,
         CarrierDocumentId: req.body.CarrierDocumentId,
-        BrokerNPN: req.body.BrokerNPN,
+        BrokerNPN: npn,
     };
 
     try {
-        const result = await clientsHandler.updateClient(subscriber);
+        const result = await clientsHandler.updateClient(subscriber, role, npn);
 
         if (result) {
             return res.status(200).json({ message: "Client was updated Successfully." })
         } else {
-            return res.status(400).json({ error: "Something went wrong :/" })
+            return res.status(400).json({ error: "No Client Found :/" })
         }
     } catch(error) {
         console.error(error);
@@ -153,6 +192,8 @@ const updateOneClient = async (req, res) => {
 
 //Delete Client
 const deleteOneClient = async (req, res) => {
+    const role = req.userRole;
+    const NPN = req.userBrokerNPN;
     const id = req.params.id
     if (id.length !== 24) {
         return res.status(404).json({
@@ -161,12 +202,14 @@ const deleteOneClient = async (req, res) => {
     }
 
     try {
-        const result = await clientsHandler.deleteClient(id);
+        const result = await clientsHandler.deleteClient(id, role, NPN);
 
         if (result.deletedCount === 1) {
             return res.status(200).json({ message: "Client was deleted successfully." })
+        } else if (result.deletedCount === 0) {
+            return res.status(400).json({ error: "No Client Found." });
         } else {
-            return res.status(400).json({ error: "Something went wrong, sorry." })
+            return res.status(400).json({ error: "Something went wrong, sorry." });
         }
     } catch (error) {
         console.error(error);
@@ -176,7 +219,6 @@ const deleteOneClient = async (req, res) => {
     } finally {
         client.close();
     }
-
 };
 
 module.exports = {

@@ -23,6 +23,7 @@ const createUser = async (req, res) => {
     };
 
     try {
+
         const result = await usersHandler.insertUser(user);
 
         if (!result) {
@@ -45,6 +46,7 @@ const createUser = async (req, res) => {
 // fetch all users
 const getAll = async (req, res) => {
     try {
+
         const data = await usersHandler.fetchAll();
 
         if (!data) {
@@ -69,6 +71,7 @@ const getOne = async (req, res) => {
     }
 
     try {
+
         const user = await usersHandler.fetchOne(id);
 
         if (!user) {
@@ -113,6 +116,7 @@ const updateOneUser = async (req, res) => {
     };
 
     try {
+
         const result = await usersHandler.updateUser(user);
 
         if (result) {
@@ -140,6 +144,7 @@ const deleteOneUser = async (req, res) => {
     }
 
     try {
+
         const result = await usersHandler.deleteUser(id);
 
         if (result.deletedCount === 1) {

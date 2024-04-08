@@ -25,11 +25,20 @@ const insertClient = async (data) => {
 
 
 // Fetch All Docs
-const fetchAllClients = async () => {
+const fetchAllClients = async (role, NPN) => {
+    let param;
+    if (role === 'BROKER') {
+        param = { BrokerNPN: NPN }
+    } else if (role === 'ADMIN') {
+        param = {};
+    } else {
+        throw new Error('No valid Role.')
+    }
+
     try {
         await client.connect();
         
-        const result = await clientsCollection.find({}).toArray();
+        const result = await clientsCollection.find(param).toArray();
 
         if (!result) {
             throw new Error('No Clients found.')
@@ -43,13 +52,23 @@ const fetchAllClients = async () => {
 
 
 // Fetch Single Doc
-const fetchOneClient = async (id) => {
+const fetchOneClient = async (id, role, NPN) => {
+    const objectId = new ObjectId(id);
+    let param;
+
+    if (role === 'BROKER') {
+        param = { _id: objectId, BrokerNPN: NPN }
+    } else if (role === 'ADMIN') {
+        param = { _id: objectId };
+    } else {
+        throw new Error('No valid Role.')
+    }
+
     try {
         await client.connect();
         
-        const objectId = new ObjectId(id);
         
-        const result = await clientsCollection.findOne({ _id: objectId });
+        const result = await clientsCollection.findOne(param);
 
         if (!result) {
             throw new Error('Client not found.')
@@ -64,28 +83,35 @@ const fetchOneClient = async (id) => {
 
 
 // Update Client
-const updateClient = async (data) => {
+const updateClient = async (data, role, npn) => {
+    let filter;
+    
     let { 
-            id, 
-            SubscriberFirstName, 
-            SubscriberLastName, 
-            SubscriberAddress,
-            SubscriberEmail, 
-            SubscriberPhone, 
-            SubscriberPolicy,
-            CarrierDocumentId,
-            BrokerNPN, 
-        } = data;
+        id, 
+        SubscriberFirstName, 
+        SubscriberLastName, 
+        SubscriberAddress,
+        SubscriberEmail, 
+        SubscriberPhone, 
+        SubscriberPolicy,
+        CarrierDocumentId,
+        BrokerNPN, 
+    } = data;
 
-    try {
-        await client.connect();
+    const objectId = new ObjectId(id);
 
-        const objectId = new ObjectId(id);
+        if (role === 'BROKER') {
+            filter = { _id: objectId, BrokerNPN: npn }
+        } else if (role === 'ADMIN') {
+            filter = {  _id: objectId };
+        } else {
+            throw new Error('No valid Role.')
+        }
+        try {
+            await client.connect();
 
         const result = await clientsCollection.findOneAndUpdate(
-            {
-                _id: objectId
-            },
+            filter,
             {
                 $set: {
                     SubscriberFirstName,
@@ -99,11 +125,11 @@ const updateClient = async (data) => {
                 }
             },
         );
-
+            
         if (!result) {
-            throw new Error('There was a problem updating the Client.')
+            throw new Error('No data found.')
         }
-
+            
         return result;
 
     } catch (error) {
@@ -112,13 +138,24 @@ const updateClient = async (data) => {
 };
 
 // Delete Client
-const deleteClient = async (id) => {
-    try {
-        const objectId = new ObjectId(id);
+const deleteClient = async (id, role, NPN) => {
+    
+    const objectId = new ObjectId(id);
 
+    let filter;
+    if (role === 'BROKER') {
+        filter = { _id: objectId, BrokerNPN: NPN }
+    } else if (role === 'ADMIN') {
+        filter = { _id: objectId };
+    } else {
+        throw new Error('No valid Role.')
+    }
+
+    try {
+        
         await client.connect();
 
-        const result = clientsCollection.deleteOne({ _id: objectId });
+        const result = clientsCollection.deleteOne(filter);
 
         return result;
     } catch (error) {

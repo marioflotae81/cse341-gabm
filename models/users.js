@@ -94,7 +94,7 @@ const updateUserLogin = async (data) => {
         if (!result) {
             throw new Error('There was a problem updating the User')
         }
-
+        
         return result;
 
     } catch (error) {

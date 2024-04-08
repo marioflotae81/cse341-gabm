@@ -31,12 +31,12 @@ routes.get('/logout', controllers.logoutRoute);
 
 routes.get('/failed', controllers.failedRoute);
 
-routes.use('/users', controllers.isLoggedIn, user);
+routes.use('/users', controllers.isLoggedIn, controllers.isAdmin, user);
 
-routes.use('/carriers', controllers.isLoggedIn, carrier);
+routes.use('/carriers', controllers.isLoggedIn, controllers.isAdmin, carrier);
 
-routes.use('/brokers', controllers.isLoggedIn, broker);
+routes.use('/brokers', controllers.isLoggedIn, controllers.isAdmin, broker);
 
-routes.use('/clients', controllers.isLoggedIn, client);
+routes.use('/clients', controllers.isLoggedIn, controllers.getRoleAndNPN, client);
 
 module.exports = routes;
